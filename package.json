@@ -1,0 +1,14 @@
+{
+  "name": "ci-cd-final-project",
+  "version": "1.0.0",
+  "description": "JavaScript CI/CD Final Project",
+  "main": "calculator.js",
+  "scripts": {
+    "lint": "eslint .",
+    "test": "jest --runInBand"
+  },
+  "devDependencies": {
+    "eslint": "^9.0.0",
+    "jest": "^29.7.0"
+  }
+}
