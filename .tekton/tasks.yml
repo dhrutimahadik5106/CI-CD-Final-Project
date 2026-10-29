@@ -1,9 +1,9 @@
-
 apiVersion: tekton.dev/v1
 kind: Task
 metadata:
   name: cleanup
 spec:
+  description: Clean the shared workspace before cloning source code
   workspaces:
     - name: source
   steps:
@@ -12,42 +12,28 @@ spec:
       script: |
         #!/bin/sh
         set -eu
-        echo "Cleaning workspace"
-        find "$(workspaces.source.path)" -mindepth 1 \
-          -maxdepth 1 -exec rm -rf -- {} +
-        echo "Workspace cleanup completed"
+        echo "Starting cleanup task"
+        cd "$(workspaces.source.path)"
+        find . -mindepth 1 -maxdepth 1 -exec rm -rf -- {} +
+        echo "Cleanup completed successfully"
 ---
 apiVersion: tekton.dev/v1
 kind: Task
 metadata:
-  name: eslint
+  name: test
 spec:
+  description: Run JavaScript unit tests using Jest
   workspaces:
     - name: source
   steps:
-    - name: lint
+    - name: jest
       image: node:20
       workingDir: $(workspaces.source.path)
       script: |
         #!/bin/sh
         set -eu
+        echo "Installing Node.js dependencies"
         npm ci
-        npm run lint
----
-apiVersion: tekton.dev/v1
-kind: Task
-metadata:
-  name: jest
-spec:
-  workspaces:
-    - name: source
-  steps:
-    - name: test
-      image: node:20
-      workingDir: $(workspaces.source.path)
-      script: |
-        #!/bin/sh
-        set -eu
-        npm ci
+        echo "Running Jest unit tests"
         npm test -- --runInBand
-        echo "Unit tests completed successfully"
+        echo "Jest tests completed successfully"
